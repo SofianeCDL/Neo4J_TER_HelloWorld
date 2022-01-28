@@ -1,0 +1,21 @@
+<component name="libraryTable">
+  <library name="neo4j-community-4.4.3-windows">
+    <ANNOTATIONS>
+      <root url="jar://$PROJECT_DIR$/../LIB/neo4j-community-4.4.3-windows.zip!/" />
+    </ANNOTATIONS>
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../LIB/neo4j-community-4.4.3-windows.zip!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../LIB/neo4j-community-4.4.3-windows.zip!/" />
+    </JAVADOC>
+    <NATIVE>
+      <root url="jar://$PROJECT_DIR$/../LIB/neo4j-community-4.4.3-windows.zip!/" />
+    </NATIVE>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../LIB/neo4j-community-4.4.3-windows.zip!/" />
+    </SOURCES>
+    <jarDirectory url="jar://$PROJECT_DIR$/../LIB/neo4j-community-4.4.3-windows.zip!/" recursive="false" />
+    <jarDirectory url="jar://$PROJECT_DIR$/../LIB/neo4j-community-4.4.3-windows.zip!/" recursive="false" type="SOURCES" />
+  </library>
+</component>
