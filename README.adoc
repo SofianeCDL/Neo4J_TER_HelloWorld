@@ -3,5 +3,7 @@
 
 == Link
 https://neo4j.com/docs/operations-manual/current/configuration/neo4j-conf/#neo4j-conf-JVM[neo4j-conf]
+
 https://neo4j.com/docs/operations-manual/current/configuration/file-locations/#table-file-locations[location]
+
 https://neo4j.com/docs/operations-manual/current/performance/memory-configuration/[memory-configuration]
