@@ -4,7 +4,6 @@ import neo4j.benchmark.types.RelTypes;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
 import org.neo4j.graphdb.*;
-import org.openjdk.jmh.annotations.*;
 
 import java.nio.file.Path;
 
