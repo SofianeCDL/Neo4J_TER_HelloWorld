@@ -1,57 +1,78 @@
 package hello.world;
 
+import hello.world.types.RelTypes;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.Schema;
+import org.openjdk.jmh.annotations.Benchmark;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Map;
 
 import static org.neo4j.configuration.GraphDatabaseSettings.DEFAULT_DATABASE_NAME;
 import static org.neo4j.internal.helpers.collection.Iterators.loop;
 
-public class Index {
+public class Cypher {
 
+    private static Node firstNode;
+    private static Node secondNode;
+    private static Relationship relationship;
     private static GraphDatabaseService graphDb;
     private static DatabaseManagementService managementService;
 
-    public static void main(String[] args) {
-        Index index = new Index();
+    private Label label;
+    private  int idToFind;
+    private String nameToFind;
+    private String nodeName;
 
-        index.start();
+    public static void main(String[] args) {
+        Cypher cypher = new Cypher();
+
+        cypher.start();
 
 
     }
     public void start() {
 
-        Index index = new Index();
+        Cypher cypher = new Cypher();
 
-        index.connectionGraph();
+        cypher.connectionGraph();
 
-        index.createIndexGraph();
+        cypher.createIndexGraph();
 
-        index.createUsers();
+        cypher.createUsers();
+        cypher.createNodeCypher();
 
-        Label label = Label.label( "User" );
-        int idToFind = 45;
-        String nameToFind = "user" + idToFind + "@neo4j.org";
-
-        index.findUser(label, idToFind, nameToFind);
-
-        index.updateUser(label, idToFind, nameToFind);
-
-        idToFind = 46;
+        label = Label.label( "User" );
+        idToFind = 0;
         nameToFind = "user" + idToFind + "@neo4j.org";
 
-        index.findUser(label, idToFind, nameToFind);
+        nodeName = "Hello";
 
-        index.removeUser(label, nameToFind);
+        cypher.findUserCypher();
+        cypher.findUserNodeCypher();
 
-        index.removeIndex();
+        cypher.removeUser(label, nameToFind);
 
-        index.shutdownGraph();
+        idToFind = 1;
+        nameToFind = "user" + idToFind + "@neo4j.org";
+
+        nodeName = "World!";
+
+        cypher.findUserCypher();
+        cypher.findUserNodeCypher();
+
+        cypher.removeUser(label, nameToFind);
+
+        cypher.removeIndex();
+        cypher.removeNodes("Hello");
+        cypher.removeNodes("World!");
+
+        cypher.shutdownGraph();
     }
 
     public void connectionGraph() {
@@ -61,12 +82,12 @@ public class Index {
     }
 
     public void createIndexGraph() {
-        IndexDefinition usernamesIndex;
+        IndexDefinition usernamesCypher;
 
         try ( Transaction tx = graphDb.beginTx() ) {
             Schema schema = tx.schema();
 
-            usernamesIndex = schema.indexFor(Label.label("User"))
+            usernamesCypher = schema.indexFor(Label.label("User"))
                     .on("username")
                     .withName("usernames")
                     .create();
@@ -80,7 +101,7 @@ public class Index {
 
         try ( Transaction tx = graphDb.beginTx() ) {
             // Create some users
-            for (int id = 0; id < 100; id++) {
+            for (int id = 0; id < 2; id++) {
                 Node userNode = tx.createNode(label);
                 userNode.setProperty("username", "user" + id + "@neo4j.org");
             }
@@ -89,7 +110,44 @@ public class Index {
         }
     }
 
-    public void findUser(Label label, int idToFind, String nameToFind) {
+    private void createNodeCypher() {
+        try (Transaction tx = graphDb.beginTx() ) {
+            firstNode = tx.createNode();
+            firstNode.setProperty("message", "Hello");
+            secondNode = tx.createNode();
+            secondNode.setProperty("message", "World!");
+
+            relationship = firstNode.createRelationshipTo(secondNode, RelTypes.KNOWS);
+            relationship.setProperty("message", "brave Neo4j ");
+
+            tx.commit();
+        }
+    }
+
+    @Benchmark
+    public void findUserNodeCypher() {
+        try ( Transaction tx = graphDb.beginTx();
+              Result result = tx.execute( "MATCH (n {message: '" + nodeName + "'}) RETURN n, n.message" ) )
+        {
+            String rows = "";
+            while ( result.hasNext() )
+            {
+                Map<String,Object> row = result.next();
+
+                for ( Map.Entry<String,Object> column : row.entrySet() )
+                {
+                    rows += column.getKey() + ": " + column.getValue() + "; ";
+                }
+                rows += "\n";
+            }
+
+            tx.commit();
+            System.out.println(rows);
+        }
+    }
+
+    @Benchmark
+    public void findUserCypher() {
         try ( Transaction tx = graphDb.beginTx() ) {
             try (ResourceIterator<Node> users = tx.findNodes(label, "username", nameToFind)) {
                 ArrayList<Node> userNodes = new ArrayList<>();
@@ -111,6 +169,7 @@ public class Index {
                 node.setProperty("username", "user" + (idToFind + 1) + "@neo4j.org");
             }
             tx.commit();
+            System.out.println("User update");
         }
     }
 
@@ -119,6 +178,14 @@ public class Index {
             for (Node node : loop(tx.findNodes(label, "username", nameToFind))) {
                 node.delete();
             }
+            tx.commit();
+            System.out.println("User remove");
+        }
+    }
+
+    private void removeNodes(String nodeMessage) {
+        try (Transaction tx = graphDb.beginTx(); Result result = tx.execute( "MATCH (n {message: '" + nodeMessage + "!'}) DETACH DELETE n" )) {
+
             tx.commit();
         }
     }

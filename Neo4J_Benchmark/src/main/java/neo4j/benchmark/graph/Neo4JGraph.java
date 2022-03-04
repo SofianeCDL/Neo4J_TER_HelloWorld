@@ -1,43 +1,46 @@
-package hello.world;
+package neo4j.benchmark.graph;
 
-import hello.world.types.RelTypes;
+import neo4j.benchmark.types.RelTypes;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
 import org.neo4j.graphdb.*;
-import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.*;
 
 import java.nio.file.Path;
 
 import static org.neo4j.configuration.GraphDatabaseSettings.DEFAULT_DATABASE_NAME;
 
-public class HelloWorld {
+//@State(Scope.Benchmark)
+public class Neo4JGraph {
 
     private static GraphDatabaseService graphDb;
     private static Node firstNode;
     private static Node secondNode;
     private static Relationship relationship;
     private static DatabaseManagementService managementService;
-    
 
 
-    public static void main(String[] args) {
 
-        HelloWorld helloWorld = new HelloWorld();
+    //@Benchmark
+   //@BenchmarkMode(Mode.AverageTime)
+    public static void main() {
 
-        helloWorld.connectionGraph();
+        Neo4JGraph Neo4JGraph = new Neo4JGraph();
+
+        Neo4JGraph.connectionGraph();
 
         try (Transaction tx = graphDb.beginTx()) {
 
-            helloWorld.createNodes(tx);
+            Neo4JGraph.createNodes(tx);
 
-            helloWorld.displayNodes();
+            Neo4JGraph.displayNodes();
 
-            helloWorld.removeNodes(tx);
+            Neo4JGraph.removeNodes(tx);
 
             tx.commit();
         }
 
-        helloWorld.shutdownGraph();
+        Neo4JGraph.shutdownGraph();
     }
 
     public void connectionGraph() {

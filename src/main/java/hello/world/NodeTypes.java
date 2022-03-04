@@ -5,6 +5,7 @@ import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
 import org.neo4j.graphdb.*;
 
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.Random;
 
@@ -55,7 +56,7 @@ public class NodeTypes<T> {
 
             tx.commit();
         }
-
+        
         nodeTypeBoolean.shutdownGraph();
 
         // Test with Boolean type.
@@ -129,7 +130,7 @@ public class NodeTypes<T> {
     }
 }
 
-class Pokemon {
+class Pokemon implements Serializable {
 
     private final int idPokemon;
     private final String pokemonName;
