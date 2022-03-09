@@ -6,9 +6,7 @@ import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.Schema;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.*;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -34,11 +32,11 @@ public class Cypher {
     public static void main(String[] args) {
         Cypher cypher = new Cypher();
 
-        cypher.start();
+        //cypher.start();
 
 
     }
-    public void start() {
+    /*public void start() {
 
         Cypher cypher = new Cypher();
 
@@ -75,14 +73,16 @@ public class Cypher {
         cypher.removeNodes("World!");
 
         cypher.shutdownGraph();
-    }
+    }*/
 
+    @Setup(Level.Trial)
     public void connectionGraph() {
         Path databaseDirectory = Path.of("/Users/Artorias/Documents/JetBrains/LIB/neo4j-community-4.4.3-windows");
         managementService = new DatabaseManagementServiceBuilder( databaseDirectory ).build();
         graphDb = managementService.database( DEFAULT_DATABASE_NAME );
     }
 
+    @Setup(Level.Trial)
     public void createIndexGraph() {
         IndexDefinition usernamesCypher;
 
@@ -98,6 +98,7 @@ public class Cypher {
         }
     }
 
+    @Setup(Level.Trial)
     public void createUsers() {
         Label label = Label.label( "User" );
 
@@ -112,7 +113,8 @@ public class Cypher {
         }
     }
 
-    private void createNodeCypher() {
+    @Setup(Level.Trial)
+    public void createNodeCypher() {
         try (Transaction tx = graphDb.beginTx() ) {
             firstNode = tx.createNode();
             firstNode.setProperty("message", "Hello");
@@ -128,6 +130,9 @@ public class Cypher {
 
     @Benchmark
     public void findUserNodeCypher() {
+
+        nodeName = "Hello";
+
         try ( Transaction tx = graphDb.beginTx();
               Result result = tx.execute( "MATCH (n {message: '" + nodeName + "'}) RETURN n, n.message" ) )
         {
@@ -144,12 +149,17 @@ public class Cypher {
             }
 
             tx.commit();
-            System.out.println(rows);
+            //System.out.println(rows);
         }
     }
 
     @Benchmark
     public void findUserCypher() {
+
+        label = Label.label( "User" );
+        idToFind = 0;
+        nameToFind = "user" + idToFind + "@neo4j.org";
+
         try ( Transaction tx = graphDb.beginTx() ) {
             try (ResourceIterator<Node> users = tx.findNodes(label, "username", nameToFind)) {
                 ArrayList<Node> userNodes = new ArrayList<>();
@@ -157,10 +167,10 @@ public class Cypher {
                     userNodes.add(users.next());
                 }
 
-                for (Node node : userNodes) {
+                /*for (Node node : userNodes) {
                     System.out.println(
                             "The username of user " + idToFind + " is " + node.getProperty("username"));
-                }
+                }*/
             }
         }
     }
@@ -175,7 +185,19 @@ public class Cypher {
         }
     }
 
-    public void removeUser(Label label, String nameToFind) {
+    /*@TearDown(Level.Trial)
+    public void tearDown() {
+        this.removeUser();
+    }*/
+
+
+    @TearDown(Level.Trial)
+    public void removeUser() {
+
+        label = Label.label( "User" );
+        idToFind = 0;
+        nameToFind = "user" + idToFind + "@neo4j.org";
+
         try (Transaction tx = graphDb.beginTx()) {
             for (Node node : loop(tx.findNodes(label, "username", nameToFind))) {
                 node.delete();
@@ -185,13 +207,18 @@ public class Cypher {
         }
     }
 
-    private void removeNodes(String nodeMessage) {
-        try (Transaction tx = graphDb.beginTx(); Result result = tx.execute( "MATCH (n {message: '" + nodeMessage + "!'}) DETACH DELETE n" )) {
+    @TearDown(Level.Trial)
+    public void removeNodes() {
+
+        nodeName = "Hello";
+
+        try (Transaction tx = graphDb.beginTx(); Result result = tx.execute( "MATCH (n {message: '" + nodeName + "!'}) DETACH DELETE n" )) {
 
             tx.commit();
         }
     }
 
+    @TearDown(Level.Trial)
     public void removeIndex() {
         try ( Transaction tx = graphDb.beginTx() )
         {
@@ -201,7 +228,8 @@ public class Cypher {
         }
     }
 
-    private void shutdownGraph() {
+    @TearDown(Level.Trial)
+    public void shutdownGraph() {
         managementService.shutdown();
     }
 }
