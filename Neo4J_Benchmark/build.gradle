@@ -24,7 +24,7 @@ test {
 }
 
 dependencies {
-    implementation 'org.neo4j:neo4j:4.4.3'
+    implementation 'org.neo4j:neo4j:4.4.4'
     implementation 'org.atlanmod.commons:commons-core:1.1.0'
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 

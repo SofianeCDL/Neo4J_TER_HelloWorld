@@ -9,15 +9,5 @@
         <module name="Neo4J_Benchmark" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="Neo4J_Kotlin" target="11" />
-      <module name="Neo4J_Kotlin_main" target="11" />
-      <module name="Neo4J_Kotlin_test" target="11" />
-    </bytecodeTargetLevel>
-  </component>
-  <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="Neo4J_TER_HelloWorld" options="--add-exports jdk.jfr/jdk.jfr.internal=ALL-UNNAMED" />
-    </option>
   </component>
 </project>

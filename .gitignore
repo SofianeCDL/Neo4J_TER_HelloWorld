@@ -4,3 +4,6 @@ target/
 # Gradle 
 build/
 .gradle/
+
+# IntelliJ
+.idea/

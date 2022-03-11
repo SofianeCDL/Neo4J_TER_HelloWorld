@@ -77,7 +77,7 @@ public class Cypher {
 
     @Setup(Level.Trial)
     public void connectionGraph() {
-        Path databaseDirectory = Path.of("/Users/Artorias/Documents/JetBrains/LIB/neo4j-community-4.4.3-windows");
+        Path databaseDirectory = Path.of("/tmp/neo4j/");
         managementService = new DatabaseManagementServiceBuilder( databaseDirectory ).build();
         graphDb = managementService.database( DEFAULT_DATABASE_NAME );
     }
