@@ -53,7 +53,7 @@ public class Cypher {
 
         nodeName = "Hello";
 
-        cypher.findUserCypher();
+        cypher.findUserCypher(label);
         cypher.findUserNodeCypher();
 
         cypher.removeUser(label, nameToFind);
@@ -63,7 +63,7 @@ public class Cypher {
 
         nodeName = "World!";
 
-        cypher.findUserCypher();
+        cypher.findUserCypher(label);
         cypher.findUserNodeCypher();
 
         cypher.removeUser(label, nameToFind);
@@ -147,7 +147,7 @@ public class Cypher {
     }
 
     @Benchmark
-    public void findUserCypher() {
+    public void findUserCypher(Label label) {
         try ( Transaction tx = graphDb.beginTx() ) {
             try (ResourceIterator<Node> users = tx.findNodes(label, "username", nameToFind)) {
                 ArrayList<Node> userNodes = new ArrayList<>();
